@@ -19,8 +19,9 @@ class GoogleTranslator {
   final _tokenProvider = GoogleTokenGenerator();
   final _languageList = LanguageList();
   final ClientType client;
+  final requestTimeoutInSeconds;
 
-  GoogleTranslator({this.client = ClientType.siteGT});
+  GoogleTranslator({this.client = ClientType.siteGT, this.requestTimeoutInSeconds = 5});
 
   /// Translates texts from specified language to another
   Future<Translation> translate(String sourceText,
@@ -48,7 +49,7 @@ class GoogleTranslator {
     };
 
     var url = Uri.https(_baseUrl, _path, parameters);
-    final data = await http.get(url);
+    final data = await http.get(url).timeout(Duration(seconds: this.requestTimeoutInSeconds));
 
     if (data.statusCode != 200) {
       throw http.ClientException('Error ${data.statusCode}: ${data.body}', url);
